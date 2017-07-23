@@ -2,7 +2,7 @@
  * @Author: lenovo
  * @Date:   2017-07-20 21:33:28
  * @Last Modified by:   lenovo
- * @Last Modified time: 2017-07-23 16:29:40
+ * @Last Modified time: 2017-07-23 18:21:58
  */
 
 'use strict';
@@ -49,7 +49,7 @@ if (PC) {
     canvas.style.display = "block";
 }
 
-var content = canvas.getContext('2d');
+var context = canvas.getContext('2d');
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
@@ -135,7 +135,7 @@ var LOADING={
 	sum:loadings.length
 }
 function Loading(config){  //加载动画构造器
-	this.imgs=config.loadings;
+	this.imgs=config.imgs;
 	this.width=config.width;
 	this.height=config.height;
 	this.sum=config.sum;
@@ -162,7 +162,15 @@ var loading=new Loading(LOADING);
 
 //游戏控制器
 setInterval(function(){
-	backg.paint(content);  //背景
+	backg.paint(context);  //背景
 	backg.step();  //动画
-	
+	switch(state){
+        case START:
+            context.drawImage(logo, 0, 0, WIDTH, HEIGHT);//logo
+            break;
+        case STARTTING:
+            loading.paint(context);
+            loading.step();
+        break;
+    }
 },60);
