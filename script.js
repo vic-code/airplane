@@ -2,7 +2,7 @@
  * @Author: lenovo
  * @Date:   2017-07-20 21:33:28
  * @Last Modified by:   lenovo
- * @Last Modified time: 2017-07-27 22:44:57
+ * @Last Modified time: 2017-07-27 22:47:44
  */
 
 'use strict';
@@ -223,67 +223,67 @@ function Hero(config) {
 
     //射击
     this.shootSpeed = 0;
-    this.shoot=function(){
+    this.shoot = function() {
         this.shootSpeed++;
-        if(this.shootSpeed%3==0){
-             if (!this.switchBullet) {
-              bullets[bullets.length] = new Bullet(BULLET);
+        if (this.shootSpeed % 3 == 0) {
+            if (!this.switchBullet) {
+                bullets[bullets.length] = new Bullet(BULLET);
             } else {
-              san_bullets[san_bullets.length] = new Bullet(BULLET);
+                san_bullets[san_bullets.length] = new Bullet(BULLET);
             }
         }
     }
 
     //撞击后的方法
-    this.brokenDown=function(){
-        this.broken=true;
-        this.frameIndex = 2;  //爆破动画
+    this.brokenDown = function() {
+        this.broken = true;
+        this.frameIndex = 2; //爆破动画
     }
 }
 
 var hero = new Hero(HERO);
 
-canvas.onmousemove = function (event) {
+canvas.onmousemove = function(event) {
     if (state == RUNNING) {
-      // a. 鼠标坐标值:pageX|clientX|offsetX|x
-      // b. 根据鼠标当前坐标值,修改hero的坐标值
-      hero.x = event.offsetX - hero.width / 2;
-      hero.y = event.offsetY - hero.height / 2;
+        // a. 鼠标坐标值:pageX|clientX|offsetX|x
+        // b. 根据鼠标当前坐标值,修改hero的坐标值
+        hero.x = event.offsetX - hero.width / 2;
+        hero.y = event.offsetY - hero.height / 2;
     }
-  }
+}
 
 //手机触摸屏
-if(!PC){
-    (function(){
-    var hasTouch = true;
-      var touchStart = hasTouch ? 'touchstart' : 'mousedown';
-      var touchMove = hasTouch ? 'touchmove' : 'mousemove';
-      var touchEnd = hasTouch ? 'touchend' : 'mouseup';
+if (!PC) {
+    (function() {
+        var hasTouch = true;
+        var touchStart = hasTouch ? 'touchstart' : 'mousedown';
+        var touchMove = hasTouch ? 'touchmove' : 'mousemove';
+        var touchEnd = hasTouch ? 'touchend' : 'mouseup';
 
-      var start = function (e) {
-        var point = hasTouch ? e.touches[0] : e;
-        //添加“触摸移动”事件监听
-        canvas.addEventListener(touchMove, move, false);
-        //添加“触摸结束”事件监听
-        canvas.addEventListener(touchEnd, end, false);
-      }
-
-      var move = function (e) {
-        var point = hasTouch ? e.touches[0] : e;
-        e.preventDefault();
-        if (state == RUNNING) {
-          hero.x = point.pageX - hero.width / 2;
-          hero.y = point.pageY - hero.height / 2;
+        var start = function(e) {
+            var point = hasTouch ? e.touches[0] : e;
+            //添加“触摸移动”事件监听
+            canvas.addEventListener(touchMove, move, false);
+            //添加“触摸结束”事件监听
+            canvas.addEventListener(touchEnd, end, false);
         }
-      }
 
-      var end = function (e) {
-        canvas.removeEventListener(touchStart, end, false);
-        canvas.removeEventListener(touchMove, move, false);
-        canvas.removeEventListener(touchEnd, end, false);
-      }
-      //添加“触摸开始”事件监听
-      canvas.addEventListener(touchStart, start, false);
+        var move = function(e) {
+            var point = hasTouch ? e.touches[0] : e;
+            e.preventDefault();
+            if (state == RUNNING) {
+                hero.x = point.pageX - hero.width / 2;
+                hero.y = point.pageY - hero.height / 2;
+            }
+        }
+
+        var end = function(e) {
+            canvas.removeEventListener(touchStart, end, false);
+            canvas.removeEventListener(touchMove, move, false);
+            canvas.removeEventListener(touchEnd, end, false);
+        }
+        //添加“触摸开始”事件监听
+        canvas.addEventListener(touchStart, start, false);
     })();
 }
 
@@ -305,8 +305,8 @@ setInterval(function() {
             loading.step();
             break;
         case RUNNING:
-            hero.paint(context);//绘制方法
-            hero.step();//动画方法
+            hero.paint(context); //绘制方法
+            hero.step(); //动画方法
             //hero.shoot();//射击方法
             break;
     }
