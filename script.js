@@ -2,7 +2,7 @@
  * @Author: lenovo
  * @Date:   2017-07-20 21:33:28
  * @Last Modified by:   lenovo
- * @Last Modified time: 2017-08-01 00:14:48
+ * @Last Modified time: 2017-08-01 00:32:36
  */
 
 'use strict';
@@ -528,6 +528,13 @@ function checkHit() {
     }
 }
 
+//绘制游戏得分和生命值
+function paintText() {
+    context.font = "bold 24px 微软雅黑";
+    context.fillText("SCORE : " + score, 10, 30);
+    context.fillText("LIFE : " + life, WIDTH - 100, 30);
+}
+
 
 //飞机跟随鼠标移动
 canvas.onmousemove = function(event) {
@@ -538,6 +545,33 @@ canvas.onmousemove = function(event) {
         hero.y = event.offsetY - hero.height / 2;
     }
 }
+
+//当鼠标离开游戏画面暂停
+canvas.onmouseout = function(event) {
+    if (state == RUNNING) {
+        state = PAUSED;
+    }
+}
+
+//鼠标移回游戏画面继续开始
+canvas.onmouseover = function(event) {
+    if (state == PAUSED) {
+        state = RUNNING;
+    }
+}
+
+//绘制游戏暂停阶段的暂停标识
+var paused = new Image();
+paused.src = "images/game_pause_nor.png";
+paused.width = 60;
+paused.height = 45;
+
+//绘制GAMEOVER的提示内容
+function paintOver() {
+    context.font = "bold 48px 微软雅黑";
+    context.fillText("GAME OVER", WIDTH / 2 - 150, HEIGHT / 2)
+}
+
 //手机触摸屏
 if (!PC) {
     (function() {
@@ -604,6 +638,22 @@ setInterval(function() {
 
             //检测碰撞
             checkHit(); //检查是否撞击方法
+
+            paintText();
+            break;
+        case PAUSED:
+            hero.paint(context); //绘制方法
+            paintBullets(); //绘制所有子弹方法
+            paintEnemies(); //绘制敌方飞机的方法
+            paintText(); //绘制游戏得分和生命值
+            context.drawImage(paused, WIDTH / 2 - paused.width / 2, HEIGHT / 2 - paused.height / 2);
+            break;
+        case GAMEOVER:
+            hero.paint(context); //绘制方法
+            paintBullets(); //绘制所有子弹方法
+            paintEnemies(); //绘制敌方飞机的方法
+            paintText(); //绘制游戏得分和生命值
+            paintOver();
             break;
     }
 }, 60);
