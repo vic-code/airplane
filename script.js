@@ -2,7 +2,7 @@
  * @Author: lenovo
  * @Date:   2017-07-20 21:33:28
  * @Last Modified by:   lenovo
- * @Last Modified time: 2017-07-31 23:46:12
+ * @Last Modified time: 2017-08-01 00:14:48
  */
 
 'use strict';
@@ -390,7 +390,7 @@ var ENEMY3 = {
     score: 10
 }
 //敌人飞机构造函数
-function Enemy(config){
+function Enemy(config) {
     this.imgs = config.imgs;
     this.width = config.width;
     this.height = config.height;
@@ -399,68 +399,68 @@ function Enemy(config){
     this.life = config.life;
     this.score = config.score;
 
-    this.x=Math.random()*(WIDTH - this.width);
+    this.x = Math.random() * (WIDTH - this.width);
     this.y = -this.height;
 
-    this.frameIndex=0;  //飞机种类控制
+    this.frameIndex = 0; //飞机种类控制
     //爆破
     this.down = false;
     //删除
     this.del = false;
 
-    this.paint=function(cxt){
-        cxt.drawImage(this.imgs[this.frameIndex],this.x,this.y);
+    this.paint = function(cxt) {
+        cxt.drawImage(this.imgs[this.frameIndex], this.x, this.y);
     }
-    this.step=function(){
-        if(this.down){  //爆破
+    this.step = function() {
+        if (this.down) { //爆破
             this.frameIndex++;
-            if(this.frameIndex==this.sum){
+            if (this.frameIndex == this.sum) {
                 this.del = true;
                 score += this.score;
                 this.frameIndex = this.sum - 1;
             }
-        }else{  //正常
-            switch(this.type){
-                case 1:  //炮灰飞机
+        } else { //正常
+            switch (this.type) {
+                case 1: //炮灰飞机
                     this.frameIndex = 0;
                     this.y += 10;
-                break;
-                case 2:  //小boss
+                    break;
+                case 2: //小boss
                     this.frameIndex = 0;
                     this.y += 5;
-                break;
-                case 3:   //boss
+                    break;
+                case 3: //boss
                     this.frameIndex = (this.frameIndex == 0) ? 1 : 0;
                     this.y++;
-                break;
+                    break;
             }
         }
     }
     //碰撞检测
-    this.hit=function(compont){
+    this.hit = function(compont) {
         return (compont.y + compont.height >= this.y &&
-        compont.x + compont.width >= this.x &&
-        compont.y <= this.y + this.height &&
-        compont.x <= this.x + this.width) ||
+                compont.x + compont.width >= this.x &&
+                compont.y <= this.y + this.height &&
+                compont.x <= this.x + this.width) ||
 
-        (compont.y + compont.height >= this.y &&
-        compont.x1 + compont.width >= this.x &&
-        compont.y <= this.y + this.height &&
-        compont.x1 <= this.x + this.width) ||
+            (compont.y + compont.height >= this.y &&
+                compont.x1 + compont.width >= this.x &&
+                compont.y <= this.y + this.height &&
+                compont.x1 <= this.x + this.width) ||
 
-        (compont.y + compont.height >= this.y &&
-        compont.x2 + compont.width >= this.x &&
-        compont.y <= this.y + this.height &&
-        compont.x2 <= this.x + this.width);
+            (compont.y + compont.height >= this.y &&
+                compont.x2 + compont.width >= this.x &&
+                compont.y <= this.y + this.height &&
+                compont.x2 <= this.x + this.width);
     }
-    this.canDown=function(){
+    this.brokenDown = function() {
         this.life--;
-        if(this.life==0){
-            this.down=true; //爆破
-            if (this.type == 3) {//大飞机
-              this.frameIndex = 2;
-            } else {//小|中飞机
-              this.frameIndex = 1;
+        if (this.life == 0) {
+            this.down = true; //爆破
+            if (this.type == 3) { //大飞机
+                this.frameIndex = 2;
+            } else { //小|中飞机
+                this.frameIndex = 1;
             }
         }
     }
@@ -469,38 +469,64 @@ function Enemy(config){
 //敌方飞机数组
 var enemies = [];
 //生成敌方飞机的函数
-function createEnemy(){
+function createEnemy() {
     var num = Math.random() * 200;
-    if(num <=8){ //小飞机
-        enemies[enemies.length]=new Enemy(ENEMY1);
-    }else if(num <= 9){ //中飞机
+    if (num <= 8) { //小飞机
+        enemies[enemies.length] = new Enemy(ENEMY1);
+    } else if (num <= 9) { //中飞机
         enemies[enemies.length] = new Enemy(ENEMY2);
-    }else if(num <= 10){ //boss
-        if (enemies.length > 0 && enemies[0].type != 3) {  //防止第一个飞机就是大boss
+    } else if (num <= 10) { //boss
+        if (enemies.length > 0 && enemies[0].type != 3) { //防止第一个飞机就是大boss
             enemies.splice(0, 0, new Enemy(ENEMY3));
-          }
-    } 
-}
-
-function paintEnemies(){
-    for (var i = 0; i < enemies.length; i++) {
-      enemies[i].paint(context);
+        }
     }
 }
 
-function stepEnemies(){
+function paintEnemies() {
     for (var i = 0; i < enemies.length; i++) {
-      enemies[i].step();
+        enemies[i].paint(context);
+    }
+}
+
+function stepEnemies() {
+    for (var i = 0; i < enemies.length; i++) {
+        enemies[i].step();
     }
 }
 
 function delEnemies() {
     for (var i = 0; i < enemies.length; i++) {
-      if (enemies[i].y == HEIGHT || enemies[i].del) {
-        enemies.splice(i, 1);
-      }
+        if (enemies[i].y == HEIGHT || enemies[i].del) {
+            enemies.splice(i, 1);
+        }
     }
-  }
+}
+
+//检测碰撞
+function checkHit() {
+    //遍历敌方飞机
+    for (var i = 0; i < enemies.length; i++) {
+        //被我方飞机撞击
+        if (enemies[i].hit(hero) && !hero.down && !enemies[i].down) {
+            hero.brokenDown(); //我方飞机执行被撞击后的逻辑
+            enemies[i].brokenDown(); //敌方飞机执行被撞击后的逻辑
+        }
+
+        //被子弹打中
+        for (var j = 0; j < bullets.length; j++) {
+            if (enemies[i].hit(bullets[j]) && !enemies[i].down) {
+                bullets[j].del = true; //子弹撞击后的逻辑
+                enemies[i].brokenDown(); //敌方飞机执行被撞击后的逻辑
+            }
+        } //被散弹打中
+        for (var k = 0; k < san_bullets.length; k++) {
+            if (enemies[i].hit(san_bullets[k]) && !enemies[i].down) {
+                san_bullets[k].del = true; //子弹撞击后的逻辑
+                enemies[i].brokenDown(); //敌方飞机执行被撞击后的逻辑
+            }
+        }
+    }
+}
 
 
 //飞机跟随鼠标移动
@@ -575,6 +601,9 @@ setInterval(function() {
             paintEnemies();
             stepEnemies();
             delEnemies();
+
+            //检测碰撞
+            checkHit(); //检查是否撞击方法
             break;
     }
 }, 60);
