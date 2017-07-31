@@ -2,7 +2,7 @@
  * @Author: lenovo
  * @Date:   2017-07-20 21:33:28
  * @Last Modified by:   lenovo
- * @Last Modified time: 2017-07-27 22:47:44
+ * @Last Modified time: 2017-07-31 22:33:56
  */
 
 'use strict';
@@ -162,6 +162,82 @@ var loading = new Loading(LOADING);
 
 
 
+//子弹类
+var bullet = new Image();
+bullet.src = "images/bullet.png";
+var BULLET = {
+    imgs: bullet,
+    width: 9,
+    height: 21
+}
+
+function Bullet(config) {
+    this.imgs = config.imgs;
+    this.width = config.width;
+    this.height = config.height;
+
+    this.x1 = hero.x + hero.width / 2 - this.width / 2 - 10;
+    this.x2 = hero.x + hero.width / 2 - this.width / 2 + 10;
+    this.y = hero.y - this.height - 10;
+    //是否删除子弹
+    this.del = false;
+
+    this.paint = function(cxt) {
+        cxt.drawImage(this.imgs, this.x1, this.y);
+        cxt.drawImage(this.imgs, this.x2, this.y);
+    }
+    //正常子弹
+    this.step = function() {
+        this.y -= 20;
+    }
+    //散弹
+    this.step_san = function() {
+        this.y -= 20;
+        this.x1 -= 10;
+        this.x2 += 10;
+    }
+}
+
+//子弹存储数组
+var bullets = [];
+var san_bullets = [];
+
+//绘制所有子弹
+function paintBullets() {
+    for (var i = 0; i < bullets.length; i++) {
+        bullets[i].paint(context);
+    }
+    for (var i = 0; i < san_bullets.length; i++) {
+        san_bullets[i].paint(context);
+    }
+}
+
+//子弹移动轨迹
+function stepBullets() {
+    for (var i = 0; i < bullets.length; i++) {
+        bullets[i].step();
+    }
+    for (var i = 0; i < san_bullets.length; i++) {
+        san_bullets[i].step_san(context);
+    }
+}
+
+//超出屏幕删除子弹容器
+function delBullets() {
+    for (var i = 0; i < bullets.length; i++) {
+        if (bullets[i].y <= -bullets[i].height || bullets[i].del) {
+            bullets.splice(i, 1);
+        }
+    }
+    for (var j = 0; j < san_bullets.length; j++) {
+        if (san_bullets[j].y <= -san_bullets[j].height || san_bullets[j].del) {
+            san_bullets.splice(j, 1);
+        }
+    }
+}
+
+
+
 //我方飞机
 var heros = [];
 heros[0] = new Image();
@@ -287,8 +363,6 @@ if (!PC) {
     })();
 }
 
-//子弹类
-
 
 
 
@@ -307,7 +381,11 @@ setInterval(function() {
         case RUNNING:
             hero.paint(context); //绘制方法
             hero.step(); //动画方法
-            //hero.shoot();//射击方法
+            hero.shoot(); //射击方法
+            paintBullets();
+            stepBullets(); //移动所有子弹方法
+            delBullets(); //移除飞出画面的子弹方法
+
             break;
     }
 }, 60);
