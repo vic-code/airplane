@@ -2,7 +2,7 @@
  * @Author: lenovo
  * @Date:   2017-07-20 21:33:28
  * @Last Modified by:   lenovo
- * @Last Modified time: 2017-07-31 22:33:56
+ * @Last Modified time: 2017-07-31 23:46:12
  */
 
 'use strict';
@@ -319,6 +319,191 @@ function Hero(config) {
 
 var hero = new Hero(HERO);
 
+
+
+//敌人的飞机
+var enemy1 = [];
+enemy1[0] = new Image();
+enemy1[0].src = "images/enemy1.png";
+enemy1[1] = new Image();
+enemy1[1].src = "images/enemy1_down1.png";
+enemy1[2] = new Image();
+enemy1[2].src = "images/enemy1_down2.png";
+enemy1[3] = new Image();
+enemy1[3].src = "images/enemy1_down3.png";
+enemy1[4] = new Image();
+enemy1[4].src = "images/enemy1_down4.png";
+var enemy2 = [];
+enemy2[0] = new Image();
+enemy2[0].src = "images/enemy2.png";
+enemy2[1] = new Image();
+enemy2[1].src = "images/enemy2_down1.png";
+enemy2[2] = new Image();
+enemy2[2].src = "images/enemy2_down2.png";
+enemy2[3] = new Image();
+enemy2[3].src = "images/enemy2_down3.png";
+enemy2[4] = new Image();
+enemy2[4].src = "images/enemy2_down4.png";
+var enemy3 = [];
+enemy3[0] = new Image();
+enemy3[0].src = "images/enemy3_n1.png";
+enemy3[1] = new Image();
+enemy3[1].src = "images/enemy3_n2.png";
+enemy3[2] = new Image();
+enemy3[2].src = "images/enemy3_down1.png";
+enemy3[3] = new Image();
+enemy3[3].src = "images/enemy3_down2.png";
+enemy3[4] = new Image();
+enemy3[4].src = "images/enemy3_down3.png";
+enemy3[5] = new Image();
+enemy3[5].src = "images/enemy3_down4.png";
+enemy3[6] = new Image();
+enemy3[6].src = "images/enemy3_down5.png";
+enemy3[7] = new Image();
+enemy3[7].src = "images/enemy3_down6.png";
+
+var ENEMY1 = {
+    imgs: enemy1,
+    width: 57,
+    height: 51,
+    sum: enemy1.length,
+    type: 1,
+    life: 1,
+    score: 1
+}
+var ENEMY2 = {
+    imgs: enemy2,
+    width: 69,
+    height: 95,
+    sum: enemy2.length,
+    type: 2,
+    life: 5,
+    score: 3
+}
+var ENEMY3 = {
+    imgs: enemy3,
+    width: 169,
+    height: 258,
+    sum: enemy3.length,
+    type: 3, //种类
+    life: 20, //生命值
+    score: 10
+}
+//敌人飞机构造函数
+function Enemy(config){
+    this.imgs = config.imgs;
+    this.width = config.width;
+    this.height = config.height;
+    this.sum = config.sum;
+    this.type = config.type;
+    this.life = config.life;
+    this.score = config.score;
+
+    this.x=Math.random()*(WIDTH - this.width);
+    this.y = -this.height;
+
+    this.frameIndex=0;  //飞机种类控制
+    //爆破
+    this.down = false;
+    //删除
+    this.del = false;
+
+    this.paint=function(cxt){
+        cxt.drawImage(this.imgs[this.frameIndex],this.x,this.y);
+    }
+    this.step=function(){
+        if(this.down){  //爆破
+            this.frameIndex++;
+            if(this.frameIndex==this.sum){
+                this.del = true;
+                score += this.score;
+                this.frameIndex = this.sum - 1;
+            }
+        }else{  //正常
+            switch(this.type){
+                case 1:  //炮灰飞机
+                    this.frameIndex = 0;
+                    this.y += 10;
+                break;
+                case 2:  //小boss
+                    this.frameIndex = 0;
+                    this.y += 5;
+                break;
+                case 3:   //boss
+                    this.frameIndex = (this.frameIndex == 0) ? 1 : 0;
+                    this.y++;
+                break;
+            }
+        }
+    }
+    //碰撞检测
+    this.hit=function(compont){
+        return (compont.y + compont.height >= this.y &&
+        compont.x + compont.width >= this.x &&
+        compont.y <= this.y + this.height &&
+        compont.x <= this.x + this.width) ||
+
+        (compont.y + compont.height >= this.y &&
+        compont.x1 + compont.width >= this.x &&
+        compont.y <= this.y + this.height &&
+        compont.x1 <= this.x + this.width) ||
+
+        (compont.y + compont.height >= this.y &&
+        compont.x2 + compont.width >= this.x &&
+        compont.y <= this.y + this.height &&
+        compont.x2 <= this.x + this.width);
+    }
+    this.canDown=function(){
+        this.life--;
+        if(this.life==0){
+            this.down=true; //爆破
+            if (this.type == 3) {//大飞机
+              this.frameIndex = 2;
+            } else {//小|中飞机
+              this.frameIndex = 1;
+            }
+        }
+    }
+}
+
+//敌方飞机数组
+var enemies = [];
+//生成敌方飞机的函数
+function createEnemy(){
+    var num = Math.random() * 200;
+    if(num <=8){ //小飞机
+        enemies[enemies.length]=new Enemy(ENEMY1);
+    }else if(num <= 9){ //中飞机
+        enemies[enemies.length] = new Enemy(ENEMY2);
+    }else if(num <= 10){ //boss
+        if (enemies.length > 0 && enemies[0].type != 3) {  //防止第一个飞机就是大boss
+            enemies.splice(0, 0, new Enemy(ENEMY3));
+          }
+    } 
+}
+
+function paintEnemies(){
+    for (var i = 0; i < enemies.length; i++) {
+      enemies[i].paint(context);
+    }
+}
+
+function stepEnemies(){
+    for (var i = 0; i < enemies.length; i++) {
+      enemies[i].step();
+    }
+}
+
+function delEnemies() {
+    for (var i = 0; i < enemies.length; i++) {
+      if (enemies[i].y == HEIGHT || enemies[i].del) {
+        enemies.splice(i, 1);
+      }
+    }
+  }
+
+
+//飞机跟随鼠标移动
 canvas.onmousemove = function(event) {
     if (state == RUNNING) {
         // a. 鼠标坐标值:pageX|clientX|offsetX|x
@@ -327,7 +512,6 @@ canvas.onmousemove = function(event) {
         hero.y = event.offsetY - hero.height / 2;
     }
 }
-
 //手机触摸屏
 if (!PC) {
     (function() {
@@ -386,6 +570,11 @@ setInterval(function() {
             stepBullets(); //移动所有子弹方法
             delBullets(); //移除飞出画面的子弹方法
 
+            //敌人飞机
+            createEnemy();
+            paintEnemies();
+            stepEnemies();
+            delEnemies();
             break;
     }
 }, 60);
